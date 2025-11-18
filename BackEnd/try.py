@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from pykrige.ok import OrdinaryKriging
 
-keren = r"C:\Users\ASUS\Desktop\code angjay\rhoapparent\BackEnd\data.xlsx"
+keren = r"rhoapparent/data.xlsx"
 data = pd.read_excel(keren)
 
 a = np.array(data["A"])
