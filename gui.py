@@ -4,7 +4,8 @@ from ttkbootstrap.constants import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from tkinter import filedialog, messagebox
-import try
+import backendf as backend
+
 
 # === GUI SETUP ===
 app = ttk.Window(themename="flatly")
@@ -36,22 +37,26 @@ def load_and_plot():
     global canvas, plot_data
     file_path = filedialog.askopenfilename(
         title="Pilih file Excel ERT",
-        filetypes=[("Excel Files", "*.xlsx")]
-    )
+    filetypes=[
+    ("All Supported Files", "*.xlsx *.xls *.csv *.txt *.dat *.tsv"),
+    ("Excel Files", "*.xlsx *.xls"),
+    ("CSV Files", "*.csv"),
+    ("Text Files", "*.txt *.dat *.tsv")
+])
     if not file_path:
         return
 
     try:
-        grid_x, grid_z, z_pred, xp, zp, rp = try.proses_data(file_path)
+        metode = metode_var.get() 
+        grid_x, grid_z, z_pred, xp, zp, rp = backend.proses_data(file_path, method=metode)
+
         plot_data = (grid_x, grid_z, z_pred, xp, zp, rp)
 
         fig, ax = plt.subplots(figsize=(8, 5))
         contour = ax.contourf(grid_x, grid_z, z_pred, cmap=cmap_var.get(), levels=50)
-        ax.scatter(xp, zp, c=rp, edgecolor='k', s=40, cmap=cmap_var.get())
         ax.set_xlabel("Jarak (m)")
         ax.set_ylabel("Kedalaman (m)")
         ax.set_title("Pseudosection Kriging Resistivitas Semu (ρₐ)")
-        ax.invert_yaxis()
         plt.colorbar(contour, ax=ax, label="ρₐ (Ωm)")
 
         if canvas:
@@ -85,7 +90,18 @@ cmap_var = ttk.StringVar(value="viridis")
 ttk.Combobox(sidebar, textvariable=cmap_var, values=[
     "jet", "viridis", "plasma", "inferno", "terrain", "cividis"
 ], bootstyle=INFO).pack(fill=X, pady=5)
+ttk.Label(sidebar, text="Metode K:", font=("Helvetica", 10, "bold")).pack(anchor=W, pady=(15, 0))
 
+metode_var = ttk.StringVar(value="S")
+ttk.Combobox(
+    sidebar,
+    textvariable=metode_var,
+    values=["S", "W", "G", "WS"],
+    bootstyle=INFO
+).pack(fill=X, pady=5)
 
 # === RUN ===
 app.mainloop()
+
+
+
